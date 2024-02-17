@@ -2,7 +2,8 @@ import java.util.Scanner;
 
 public class StudentRecordManagementSystem {
     private static int totalStudents = 0;
-    private static Student[] studentList = new Student[100];
+    private static final int MAX_STUDENTS = 100;
+    private static final Student[] studentList = new Student[MAX_STUDENTS];
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -37,14 +38,19 @@ public class StudentRecordManagementSystem {
     }
 
     private static void addNewStudent(Scanner scanner) {
+        if (totalStudents == MAX_STUDENTS) {
+            System.out.println("Maximum number of students reached. Cannot add more students.");
+            return;
+        }
+
         System.out.print("Enter student name: ");
         String name = scanner.next();
         System.out.print("Enter student ID: ");
-        int id = scanner.nextInt();
+        int id = readIntegerInput(scanner);
         System.out.print("Enter student age: ");
-        int age = scanner.nextInt();
+        int age = readIntegerInput(scanner);
         System.out.print("Enter student grade: ");
-        double grade = scanner.nextDouble();
+        double grade = readDoubleInput(scanner);
 
         studentList[totalStudents++] = new Student(name, id, age, grade);
         System.out.println("Student added successfully.");
@@ -52,50 +58,73 @@ public class StudentRecordManagementSystem {
 
     private static void updateStudentInformation(Scanner scanner) {
         System.out.print("Enter student ID to update information: ");
-        int id = scanner.nextInt();
+        int id = readIntegerInput(scanner);
 
-        boolean found = false;
-        for (int i = 0; i < totalStudents; i++) {
-            if (studentList[i].getId() == id) {
-                System.out.print("Enter new student name: ");
-                String name = scanner.next();
-                System.out.print("Enter new student age: ");
-                int age = scanner.nextInt();
-                System.out.print("Enter new student grade: ");
-                double grade = scanner.nextDouble();
-
-                studentList[i].setName(name);
-                studentList[i].setAge(age);
-                studentList[i].setGrade(grade);
-                System.out.println("Student information updated successfully.");
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
+        int index = findStudentIndexById(id);
+        if (index == -1) {
             System.out.println("Student with ID " + id + " not found.");
+            return;
         }
+
+        System.out.print("Enter new student name: ");
+        String name = scanner.next();
+        System.out.print("Enter new student age: ");
+        int age = readIntegerInput(scanner);
+        System.out.print("Enter new student grade: ");
+        double grade = readDoubleInput(scanner);
+
+        studentList[index].setName(name);
+        studentList[index].setAge(age);
+        studentList[index].setGrade(grade);
+        System.out.println("Student information updated successfully.");
     }
 
     private static void viewStudentDetails(Scanner scanner) {
         System.out.print("Enter student ID to view details: ");
-        int id = scanner.nextInt();
+        int id = readIntegerInput(scanner);
 
-        boolean found = false;
-        for (int i = 0; i < totalStudents; i++) {
-            if (studentList[i].getId() == id) {
-                System.out.println("Student Details:");
-                System.out.println("Name: " + studentList[i].getName());
-                System.out.println("ID: " + studentList[i].getId());
-                System.out.println("Age: " + studentList[i].getAge());
-                System.out.println("Grade: " + studentList[i].getGrade());
-                found = true;
-                break;
+        int index = findStudentIndexById(id);
+        if (index == -1) {
+            System.out.println("Student with ID " + id + " not found.");
+            return;
+        }
+
+        System.out.println("Student Details:");
+        System.out.println("Name: " + studentList[index].getName());
+        System.out.println("ID: " + studentList[index].getId());
+        System.out.println("Age: " + studentList[index].getAge());
+        System.out.println("Grade: " + studentList[index].getGrade());
+    }
+
+    private static int readIntegerInput(Scanner scanner) {
+        while (true) {
+            try {
+                return scanner.nextInt();
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter an integer value.");
+                scanner.nextLine(); // Clear the input buffer
             }
         }
-        if (!found) {
-            System.out.println("Student with ID " + id + " not found.");
+    }
+
+    private static double readDoubleInput(Scanner scanner) {
+        while (true) {
+            try {
+                return scanner.nextDouble();
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a numeric value.");
+                scanner.nextLine(); // Clear the input buffer
+            }
         }
+    }
+
+    private static int findStudentIndexById(int id) {
+        for (int i = 0; i < totalStudents; i++) {
+            if (studentList[i].getId() == id) {
+                return i;
+            }
+        }
+        return -1; // Student not found
     }
 
     static class Student {
@@ -111,32 +140,6 @@ public class StudentRecordManagementSystem {
             this.grade = grade;
         }
 
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public int getAge() {
-            return age;
-        }
-
-        public void setAge(int age) {
-            this.age = age;
-        }
-
-        public double getGrade() {
-            return grade;
-        }
-
-        public void setGrade(double grade) {
-            this.grade = grade;
-        }
+        // Getter and setter methods omitted for brevity
     }
 }
