@@ -2,7 +2,8 @@ import java.util.Scanner;
 
 public class StudentRecordManagementSystem {
     private static int totalStudents = 0;
-    private static Student[] studentList = new Student[100];
+    private static final int MAX_STUDENTS = 100;
+    private static final Student[] studentList = new Student[MAX_STUDENTS];
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -37,10 +38,31 @@ public class StudentRecordManagementSystem {
     }
 
     private static void addNewStudent(Scanner scanner) {
+        if (totalStudents == MAX_STUDENTS) {
+            System.out.println("Maximum number of students reached. Cannot add more students.");
+            return;
+        }
+
         System.out.print("Enter student name: ");
         String name = scanner.next();
-        System.out.print("Enter student ID: ");
-        int id = scanner.nextInt();
+
+        int id;
+        while (true) {
+            try {
+                System.out.print("Enter student ID: ");
+                id = scanner.nextInt();
+                if (id < 0) {
+                    throw new IllegalArgumentException("Invalid student ID. Please enter a positive integer value.");
+                }
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a valid integer value.");
+                scanner.nextLine(); // Consume the invalid input
+            }
+        }
+
         System.out.print("Enter student age: ");
         int age = scanner.nextInt();
         System.out.print("Enter student grade: ");
@@ -54,48 +76,49 @@ public class StudentRecordManagementSystem {
         System.out.print("Enter student ID to update information: ");
         int id = scanner.nextInt();
 
-        boolean found = false;
-        for (int i = 0; i < totalStudents; i++) {
-            if (studentList[i].getId() == id) {
-                System.out.print("Enter new student name: ");
-                String name = scanner.next();
-                System.out.print("Enter new student age: ");
-                int age = scanner.nextInt();
-                System.out.print("Enter new student grade: ");
-                double grade = scanner.nextDouble();
-
-                studentList[i].setName(name);
-                studentList[i].setAge(age);
-                studentList[i].setGrade(grade);
-                System.out.println("Student information updated successfully.");
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
+        int index = findStudentIndexById(id);
+        if (index == -1) {
             System.out.println("Student with ID " + id + " not found.");
+            return;
         }
+
+        System.out.print("Enter new student name: ");
+        String name = scanner.next();
+        System.out.print("Enter new student age: ");
+        int age = scanner.nextInt();
+        System.out.print("Enter new student grade: ");
+        double grade = scanner.nextDouble();
+
+        studentList[index].setName(name);
+        studentList[index].setAge(age);
+        studentList[index].setGrade(grade);
+        System.out.println("Student information updated successfully.");
     }
 
     private static void viewStudentDetails(Scanner scanner) {
         System.out.print("Enter student ID to view details: ");
         int id = scanner.nextInt();
 
-        boolean found = false;
+        int index = findStudentIndexById(id);
+        if (index == -1) {
+            System.out.println("Student with ID " + id + " not found.");
+            return;
+        }
+
+        System.out.println("Student Details:");
+        System.out.println("Name: " + studentList[index].getName());
+        System.out.println("ID: " + studentList[index].getId());
+        System.out.println("Age: " + studentList[index].getAge());
+        System.out.println("Grade: " + studentList[index].getGrade());
+    }
+
+    private static int findStudentIndexById(int id) {
         for (int i = 0; i < totalStudents; i++) {
             if (studentList[i].getId() == id) {
-                System.out.println("Student Details:");
-                System.out.println("Name: " + studentList[i].getName());
-                System.out.println("ID: " + studentList[i].getId());
-                System.out.println("Age: " + studentList[i].getAge());
-                System.out.println("Grade: " + studentList[i].getGrade());
-                found = true;
-                break;
+                return i;
             }
         }
-        if (!found) {
-            System.out.println("Student with ID " + id + " not found.");
-        }
+        return -1; // Student not found
     }
 
     static class Student {
