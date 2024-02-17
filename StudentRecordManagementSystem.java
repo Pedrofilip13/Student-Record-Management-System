@@ -45,12 +45,28 @@ public class StudentRecordManagementSystem {
 
         System.out.print("Enter student name: ");
         String name = scanner.next();
-        System.out.print("Enter student ID: ");
-        int id = readIntegerInput(scanner);
+
+        int id;
+        while (true) {
+            try {
+                System.out.print("Enter student ID: ");
+                id = scanner.nextInt();
+                if (id < 0) {
+                    throw new IllegalArgumentException("Invalid student ID. Please enter a positive integer value.");
+                }
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a valid integer value.");
+                scanner.nextLine(); // Consume the invalid input
+            }
+        }
+
         System.out.print("Enter student age: ");
-        int age = readIntegerInput(scanner);
+        int age = scanner.nextInt();
         System.out.print("Enter student grade: ");
-        double grade = readDoubleInput(scanner);
+        double grade = scanner.nextDouble();
 
         studentList[totalStudents++] = new Student(name, id, age, grade);
         System.out.println("Student added successfully.");
@@ -58,7 +74,7 @@ public class StudentRecordManagementSystem {
 
     private static void updateStudentInformation(Scanner scanner) {
         System.out.print("Enter student ID to update information: ");
-        int id = readIntegerInput(scanner);
+        int id = scanner.nextInt();
 
         int index = findStudentIndexById(id);
         if (index == -1) {
@@ -69,9 +85,9 @@ public class StudentRecordManagementSystem {
         System.out.print("Enter new student name: ");
         String name = scanner.next();
         System.out.print("Enter new student age: ");
-        int age = readIntegerInput(scanner);
+        int age = scanner.nextInt();
         System.out.print("Enter new student grade: ");
-        double grade = readDoubleInput(scanner);
+        double grade = scanner.nextDouble();
 
         studentList[index].setName(name);
         studentList[index].setAge(age);
@@ -81,7 +97,7 @@ public class StudentRecordManagementSystem {
 
     private static void viewStudentDetails(Scanner scanner) {
         System.out.print("Enter student ID to view details: ");
-        int id = readIntegerInput(scanner);
+        int id = scanner.nextInt();
 
         int index = findStudentIndexById(id);
         if (index == -1) {
@@ -94,28 +110,6 @@ public class StudentRecordManagementSystem {
         System.out.println("ID: " + studentList[index].getId());
         System.out.println("Age: " + studentList[index].getAge());
         System.out.println("Grade: " + studentList[index].getGrade());
-    }
-
-    private static int readIntegerInput(Scanner scanner) {
-        while (true) {
-            try {
-                return scanner.nextInt();
-            } catch (Exception e) {
-                System.out.println("Invalid input. Please enter an integer value.");
-                scanner.nextLine(); // Clear the input buffer
-            }
-        }
-    }
-
-    private static double readDoubleInput(Scanner scanner) {
-        while (true) {
-            try {
-                return scanner.nextDouble();
-            } catch (Exception e) {
-                System.out.println("Invalid input. Please enter a numeric value.");
-                scanner.nextLine(); // Clear the input buffer
-            }
-        }
     }
 
     private static int findStudentIndexById(int id) {
@@ -140,6 +134,32 @@ public class StudentRecordManagementSystem {
             this.grade = grade;
         }
 
-        // Getter and setter methods omitted for brevity
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        public void setAge(int age) {
+            this.age = age;
+        }
+
+        public double getGrade() {
+            return grade;
+        }
+
+        public void setGrade(double grade) {
+            this.grade = grade;
+        }
     }
 }
